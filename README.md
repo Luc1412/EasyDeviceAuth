@@ -1,5 +1,5 @@
 # EasyDeviceAuth
-EasyDeviceAuth is a tool to automate the process to generate a device_auths.json file, which for example is used by the popular [fortnitepy](https://github.com/Terbau/fortnitepy) library.
+EasyDeviceAuth is a tool to automate the process to generate a device_auths.json file for multiple EpicGames Accounts, which for example is used by the popular [fortnitepy](https://github.com/Terbau/fortnitepy) library.
 
 
 ### **Only Windows is supported atm!**
