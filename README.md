@@ -1,5 +1,5 @@
 # EasyDeviceAuth
-EasyDeviceAuth is a tool to generate a device_auth.json file, which for example is used by the popular [fortnitepy](https://github.com/Terbau/fortnitepy) library.
+EasyDeviceAuth is a tool to automate the process to generate a device_auths.json file, which for example is used by the popular [fortnitepy](https://github.com/Terbau/fortnitepy) library.
 
 
 ### **Only Windows is supported atm!**
@@ -16,8 +16,7 @@ This is an example how the result looks like:
     "device_id": "sample_device_id2",
     "account_id": "sample_account_id2",
     "secret": "sample_secret2"
-  },
-  ...
+  }
 }
 ```
 
@@ -25,14 +24,13 @@ This is an example how the result looks like:
 
 1.) Download and install Firefox from [here](https://www.mozilla.org/en-US/firefox/new/).
 
-2.) Download the latest executable from [here]() and place it into a folder
+2.) Download the latest executable from [here](https://github.com/Luc1412/EasyDeviceAuth/releases/latest) and place it into a folder
 
 3.) Create a `credentials.json` file where you can insert your account details. Here is an example:
 ```json
 {
   "email1": "password1",
-  "email2": "password2",
-  ...
+  "email2": "password2"
 }
 ```
 
