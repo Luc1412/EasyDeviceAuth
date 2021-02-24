@@ -1,11 +1,5 @@
-import asyncio
 import json
 import os
-import sys
-import uuid
-import zipfile
-from typing import Optional
-from urllib.request import urlretrieve
 
 import chromedriver_autoinstaller
 from pip._vendor import requests
@@ -21,26 +15,13 @@ driver = webdriver.Chrome
 
 
 def download_driver():
-    print('Check for installed OS...')
-    global driver
-    if sys.platform == 'darwin':
-        print('Mac OS User. No additional drivers required. Using Safari as browser...')
-        driver = webdriver.Safari
-    else:
-        print('Windows or Linux User. Installing chrome driver...')
+    print('Installing drivers...')
+    try:
         chromedriver_autoinstaller.install()
-
-    # if os.path.isfile('geckodriver.exe'):
-    #     return print('Webdriver found!')
-    # print('Driver not found. Download driver...')
-    # urlretrieve(DRIVER_DOWNLOAD_URL, 'geckodriver.zip')
-    # print('Successfully downloaded driver. Unpacking driver....')
-    # with zipfile.ZipFile('edgedriver.zip', 'r') as zip_ref:
-    #     zip_ref.extractall('temp')
-    # os.remove('geckodriver.zip')
-    # os.rename('temp/geckodriver.exe', 'geckodriver.exe')
-    # os.rmdir('temp')
-    # print('Driver successfully unpacked.')
+    except:
+        print('Chrome is not installed. Please install it and try again.')
+        return False
+    return True
 
 
 def get_device_auth_details():
@@ -137,7 +118,9 @@ def get_code(email, password):
 
 
 if __name__ == '__main__':
-    download_driver()
+    success = download_driver()
+    if not success:
+        exit(1)
     print('Load credentials...')
     if not os.path.isfile('credentials.json'):
         with open('credentials.json', 'w') as fp:
