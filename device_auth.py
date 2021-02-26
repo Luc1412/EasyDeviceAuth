@@ -1,8 +1,9 @@
+import asyncio
 import json
 import os
 
+import aiohttp
 import chromedriver_autoinstaller
-from pip._vendor import requests
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
@@ -16,11 +17,11 @@ driver = webdriver.Chrome
 
 def download_driver():
     print('Installing drivers...')
-    try:
-        chromedriver_autoinstaller.install()
-    except:
-        print('Chrome is not installed. Please install it and try again.')
-        return False
+    #try:
+    chromedriver_autoinstaller.install(True)
+    #except:
+    #    print('Chrome is not installed. Please install it and try again.')
+    #    return False
     return True
 
 
@@ -39,7 +40,7 @@ def store_device_auth_details(email, details):
         json.dump(existing, fp)
 
 
-def get_device_auth(email, code):
+async def get_device_auth(email, code):
     headers = {
         'Content-Type': 'application/x-www-form-urlencoded',
         'Authorization': f'basic {IOS_TOKEN}',
@@ -50,10 +51,11 @@ def get_device_auth(email, code):
         'includePerms': False,
     }
     auth_code_url = 'https://account-public-service-prod.ol.epicgames.com/account/api/oauth/token'
-    response = requests.post(auth_code_url, data=payload, headers=headers)
-    if response.status_code >= 400:
+    async with aiohttp.ClientSession() as session:
+        response = await session.post(auth_code_url, data=payload, headers=headers)
+    if response.status >= 400:
         try:
-            error = response.json()
+            error = await response.json()
         except ValueError:
             error = {}
         error_code = error.get('errorCode', 'Not provided')
@@ -69,7 +71,7 @@ def get_device_auth(email, code):
                 f'Message: {error_message}'
             )
 
-    data = response.json()
+    data = await response.json()
     account_id = data['account_id']
     access_token = data['access_token']
     display_name = data['displayName']
@@ -77,10 +79,11 @@ def get_device_auth(email, code):
     headers = {'Authorization': f'bearer {access_token}'}
     device_auth_url = \
         f'https://account-public-service-prod.ol.epicgames.com/account/api/public/account/{account_id}/deviceAuth'
-    response = requests.post(device_auth_url, headers=headers)
-    if response.status_code >= 400:
+    async with aiohttp.ClientSession() as session:
+        response = await session.post(device_auth_url, headers=headers)
+    if response.status >= 400:
         try:
-            error = response.json()
+            error = await response.json()
         except ValueError:
             error = {}
         error_code = error.get('errorCode', 'Not provided')
@@ -90,7 +93,7 @@ def get_device_auth(email, code):
                         f'Code: {error_code} '
                         f'Message: {error_message}')
 
-    data = response.json()
+    data = await response.json()
     return {'device_id': data['deviceId'], 'account_id': data['accountId'], 'secret': data['secret']}
 
 
@@ -108,7 +111,8 @@ def get_code(email, password):
     signin_button.click()
     print('Wait for entering 2-FA code and/or solving captcha...')
     WebDriverWait(session_driver, 60 * 60).until(EC.url_matches('https://www.epicgames.com/account/personal'))
-    session_driver.get('view-source:https://www.epicgames.com/id/api/redirect?clientId=3446cd72694c4a4485d81b77adbb2141&responseType=code')
+    session_driver.get('https://www.epicgames.com/id/api/redirect?clientId=3446cd72694c4a4485d81b77adbb2141&responseType=code')
+    print(session_driver.page_source)
     WebDriverWait(session_driver, 30).until(EC.presence_of_element_located((By.TAG_NAME, 'pre')))
     pre = session_driver.find_element_by_tag_name("pre").text
     session_driver.close()
@@ -118,6 +122,8 @@ def get_code(email, password):
 
 
 if __name__ == '__main__':
+    loop = asyncio.new_event_loop()
+    asyncio.set_event_loop(loop)
     success = download_driver()
     if not success:
         exit(1)
@@ -132,7 +138,7 @@ if __name__ == '__main__':
         print(f'Getting authorization code for {email}...')
         code = get_code(email, password)
         print(f'Generating device auth for {email}')
-        device_auth = get_device_auth(email, code)
+        device_auth = loop.run_until_complete(get_device_auth(email, code))
         store_device_auth_details(email, device_auth)
         print(f'Successfully generated device auth for {email}')
     print('Finished generating device auths.')
