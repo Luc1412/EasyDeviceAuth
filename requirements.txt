@@ -1,3 +1,2 @@
 selenium
-aiohttp
 chromedriver-autoinstaller
