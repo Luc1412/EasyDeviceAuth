@@ -2,6 +2,9 @@
 [![Discord](https://img.shields.io/discord/341939185051107330?color=%237289DA&label=Discord&logo=discord&logoColor=white&style=for-the-badge)](https://discord.gg/Sw5RbXD)
 [![GitHub all releases](https://img.shields.io/github/downloads/luc1412/EasyDeviceAuth/total?logo=github&style=for-the-badge)](https://github.com/Luc1412/EasyDeviceAuth/releases/latest)
 
+### Deprecation: This project was discontinued in 2020 due to the switch from Epic to hCaptcha. Currently, running the programme may result in endless captchas due to the low trustworthiness of the Selenium browser.
+
+
 EasyDeviceAuth is a tool to automate the process to generate a `device_auths.json` file for multiple EpicGames Accounts, which for example is used by the popular [fortnitepy](https://github.com/Terbau/fortnitepy) library.
 
 
